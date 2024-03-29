@@ -1,4 +1,4 @@
-import { Avatar, Box, Flex, Image, Text } from "@chakra-ui/react"
+import { Avatar, Box, Button, Flex, Image, Menu, MenuButton, MenuItem, MenuList, Portal, Text } from "@chakra-ui/react"
 import { BsThreeDots } from "react-icons/bs";
 import { Link } from "react-router-dom"
 import Actions from "./Actions";
@@ -52,7 +52,19 @@ const UserPost = ({ postImg, postTitle, likes, replies }) => {
                 </Flex>
                 <Flex gap={4} alignItems={"center"} >
                     <Text fontStyle={"sm"} color={"gray.light"}>1d</Text>
-                    <BsThreeDots  />
+                  
+<Menu>
+  <MenuButton onClick={(e) => e.preventDefault()} >
+    <BsThreeDots />
+  </MenuButton>
+  {/* <MenuList>
+    <MenuItem>Download</MenuItem>
+    <MenuItem>Create a Copy</MenuItem>
+    <MenuItem>Mark as Draft</MenuItem>
+    <MenuItem>Delete</MenuItem>
+    <MenuItem>Attend a Workshop</MenuItem>
+  </MenuList> */}
+</Menu>
                 </Flex>
                 </Flex>
                 <Text fontSize={"sm"}>{postTitle}</Text>
