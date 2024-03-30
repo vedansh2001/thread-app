@@ -64,8 +64,8 @@ const PostPage = () => {
       comment="Looks good!"
       createdAt="2d"
       likes={42}
-      username="Kent Dodds"
-      userAvatar="https://bit.ly/kent-c-dodd"
+      username="Ryan Florence"
+      userAvatar="https://bit.ly/ryan-florence"
     />
     
 
