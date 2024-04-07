@@ -31,9 +31,11 @@ const styles = {
   const theme = extendTheme({ config, styles, colors})
 
 ReactDOM.createRoot(document.getElementById('root')).render(
+
+//here we wrapped with RecoilRool so that we can use atoms
+
   <React.StrictMode>
 
-    
     <RecoilRoot>  
     <BrowserRouter>
     <ChakraProvider theme={theme} >

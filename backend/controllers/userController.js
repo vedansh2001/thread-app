@@ -1,7 +1,7 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndCookie from "../utils/helpers/generateTokenAndSetCookie.js";
-
+import {v2 as cloudinary} from "cloudinary";
 
 const getUserProfile = async (req, res) => {
     const{username} = req.params;
@@ -38,14 +38,17 @@ const signupUser = async(req, res) => {
 
         await newUser.save();
 
-        generateTokenAndCookie(newUser._id, res);
+        
 
         if(newUser){
+            generateTokenAndCookie(newUser._id, res);
             res.status(201).json({
                 _id: newUser._id,
                 name: newUser.name,
                 email: newUser.email,
-                username: newUser.username,                
+                username: newUser.username,   
+                bio: newUser.bio,  
+                profilePic: newUser.profilePic,           
             });
         }
         else{
@@ -70,9 +73,11 @@ const loginUser = async(req, res) => {
         generateTokenAndCookie(user._id, res);
         res.status(200).json({
             _id: user._id,
-            name: username,
+            name: user.name,
             email: user.email,
             username: user.username,
+            bio: user.bio,
+            profilePic: user.profilePic,
         })
         
     } catch (error) {
@@ -134,8 +139,8 @@ const followUnFollowUser = async(req,res) => {
 };
 
 const updateUser = async (req, res) => {
-    const{email, name,  username, password, profilePic, bio } = req.body;
-    
+    const{name, email, username, password, bio } = req.body;
+    let { profilePic } = req.body;
     const userId = req.user._id;
     try {
         let user = await User.findById(userId);
@@ -148,15 +153,32 @@ const updateUser = async (req, res) => {
             user.password = hashedPassword;
         }
 
+        if(profilePic){
+//if a photo is already uploaded then first destroy that and then upload new one.
+          if (user.profilePic) {
+
+//  ".pop().split(".")[0]" <= This helps us to get the img id from the link 
+            await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
+          }
+//upload on cloudinary and will return an object if successful
+          const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+//a secure url will be provided by cloudinary and it will be reassigned to profilePic
+          profilePic = uploadedResponse.secure_url;
+          console.log(profilePic);
+        }
+
         user.name = name || user.name;
-        user.email = email || user.email;
-        user.username = username || user.username;
-        user.profilePic = profilePic || user.profilePic;
-        user.bio = bio || user.bio;
+		user.email = email || user.email;
+		user.username = username || user.username;
+		user.profilePic = profilePic || user.profilePic;
+		user.bio = bio || user.bio;
 
         user = await user.save();
+        //password should be null in response, so that password is not sent in cloudinary
+        user.password = null;
 
-        res.status(200).json({message : "Profile updated successfully", user});
+        //send this user to frontend
+        res.status(200).json(user);
         
     } catch (err) {
         res.status(500).json({error: err.message});

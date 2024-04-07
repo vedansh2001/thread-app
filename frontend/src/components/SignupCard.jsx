@@ -46,14 +46,22 @@ export default function SignupCard() {
                 body: JSON.stringify(inputs),
                 
             })
+
+            //data fetch
             const data = await res.json()
             
+
+            //if error in data fetching
             if(data.error){
                 showToast("Error", data.error, "error");
                 return;                
             }
 
+            //setting this user to our local storage
             localStorage.setItem("user-threads",JSON.stringify(data));
+
+//updating our state, which eventually will tell that user 
+//is logged in and he will be taken to home page directly            
             setUser(data);
 
         } catch (error) {
