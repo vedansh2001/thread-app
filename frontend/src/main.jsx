@@ -34,6 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 //here we wrapped with RecoilRool so that we can use atoms
 
+//React.StrictMode renders every components twice, on development
   <React.StrictMode>
 
     <RecoilRoot>  

@@ -108,10 +108,8 @@ const followUnFollowUser = async(req,res) => {
 
         if(id === req.user._id.toString()) return res.status(400).json({error: "You cannot follow/unfollow yourself"});
 
-        if(!userToModify || !currentUser) return res.status(400).json({error: "User not found"});
-
-    
-
+        if(!userToModify || !currentUser) return res.status(400).json({error: "User not found"}); 
+        
         const isFollowing = currentUser.following.includes(id);
         if(isFollowing){
           //unfollow user
