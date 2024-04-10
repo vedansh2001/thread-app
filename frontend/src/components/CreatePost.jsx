@@ -15,9 +15,9 @@ const CreatePost = () => {
     const [postText, setPostText] = useState('');
     const {handleImageChange, imgUrl, setImgUrl } = usePreviewImg();
     const imageRef = useRef(null);
-    const [remainingChar, setRemainingChar] = useState(500);
+    const [remainingChar, setRemainingChar] = useState(MAX_CHAR);
     const user = useRecoilValue(userAtom);
-    const showToast = useShowToast;
+    const showToast = useShowToast();
     const [loading, setloading] = useState(false);
 
     const handleTextChange = (e) => {
@@ -41,16 +41,16 @@ const CreatePost = () => {
                 headers:{
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({postedBy:user._id, text: postText, img: imgUrl})
+                body: JSON.stringify({postedBy:user._id, text: postText, img: imgUrl}),
             })
     
             const data = await res.json()
-            if(data.error){
-                showToast("Error", data.error, "error")
-                return;
+            if (data.error) {
+              showToast("Error", data.error, "error");
+              return;
             }
-            showToast("Success", "Post created successfully", "success");
-            onclose();
+            showToast("Success", "Post created successfully", "success")
+            onClose();
             //after the post is posted clear the the text from the text section. 
             setPostText("");
             setImgUrl("");
