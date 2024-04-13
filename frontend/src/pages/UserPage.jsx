@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 import UserHeader from "../components/UserHeader"
-import UserPost from "../components/UserPost"
 import { useParams } from "react-router-dom";
 import useShowToast from '../hooks/useShowToast';
 import { Flex, Spinner } from "@chakra-ui/react";
+import Post from "../components/Post";
 
 const UserPage = () => {
 
@@ -11,6 +11,8 @@ const UserPage = () => {
   const {username} = useParams();
   const showToast = useShowToast();
   const [loading, setloading] = useState(true);
+  const [posts, setPosts] = useState([]);
+  const [fetchingPosts, setFetchingPosts] = useState(true);
 
   useEffect(() => {
     const getUser = async () => {
@@ -23,13 +25,29 @@ const UserPage = () => {
         }
         setUser(data);        
       } catch (error) {
-        showToast("Error", error, "error");
+        showToast("Error", error.message, "error");
       }
       finally{
         setloading(false);
       }
     }
+
+    const getPosts = async () => {
+      setFetchingPosts(true);
+      try {
+        const res = await fetch (`/api/posts/user/${username}`);
+        const data = await res.json();
+        setPosts(data);
+      } catch (error) {
+        showToast("Error", error.message, "error");
+        setPosts([]);
+      }finally{
+        setFetchingPosts(false);
+      }
+    }
+
     getUser(); 
+    getPosts();
   },[username, showToast]);
     
   if(!user && loading){
@@ -42,13 +60,33 @@ const UserPage = () => {
 
   if(!user && !loading) return <h1>User not found</h1>;
 
+// Writng comment over here become can't write in "return"..
+// loading spinner will be displayed until the loading state becomes false
+//  indicating that posts have been fetched.
+// {!loading && posts.length > 0 && (
+//   posts.map((post) => (
+//     <Post key={post._id}  post={post} postedBy={post.postedBy}  />
+//   ))    )}
+
   return (
     <>
     <UserHeader user={user} />
-    <UserPost likes={1200} replies={481} postImg="/post1.png" postTitle="Let's talk about threads." />
-    <UserPost likes={451} replies={12} postImg="/post2.png" postTitle="Nice tutorial" />
-    <UserPost likes={321} replies={989} postImg="/post3.png" postTitle="I love this guy." />
-    <UserPost likes={212} replies = {56} postTitle="This is my first thread." />
+    
+    {!fetchingPosts && posts.length === 0 && <h1>User has no posts</h1>}
+    {fetchingPosts && (
+      <Flex justifyContent={"center"} my={12} >
+        <Spinner size={"xl"} />
+      </Flex>
+    )}
+
+
+{!loading && posts.length > 0 && (
+posts.map((post) => (
+  <Post key={post._id}  post={post} postedBy={post.postedBy}  />
+))    )}
+
+        
+    
     
     </>
   )

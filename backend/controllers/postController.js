@@ -69,8 +69,14 @@ const deletePost = async (req, res) => {
             return res.status(401).json({error: "Unauthorized to delte post"});
         }
 
+        //if we delte a post from backend then it should be deleted form cloudinary also.
+        if(post.img){
+            const imgId = post.img.split("/").pop().split(".")[0];
+            await cloudinary.uploader.destroy(imgId);
+        }
+
         await Post.findByIdAndDelete(req.params.id);
-        res.status(500).json({ message: "Post deleted successfully" });
+        res.status(200).json({ message: "Post deleted successfully" });
 
         
     } catch (error) {
@@ -110,7 +116,7 @@ const linkUnlikePost = async(req, res) => {
 
 const replyToPost = async (req, res) => {
     try {
-        const {text} = req.body;
+        const {text} = req.body; //will be provided by frontend
         const postId = req.params.id;
         const userId = req.user._id;
         const userProfilePic = req.user._id;
@@ -153,4 +159,19 @@ const getFeedPosts = async (req, res) => {
         res.status(500).json({error: error.message});        
     }
 }
-export { createPost, getPost, deletePost,linkUnlikePost,replyToPost,getFeedPosts} ;
+
+const getUserPosts = async (req, res) => {
+    const {username} = req.params;
+    try {
+        const user = await User.findOne({ username });
+        if(!user){
+            return res.status(404).json({error: "User not found"});
+        }       
+        const posts = await Post.find({ postedBy: user._id }).sort({ createdAt: -1}); // createdAt -1 means sort in decending order
+        res.status(200).json(posts);    
+    } catch (error) {
+        res.status(500).json({error : error.message});            
+    }
+}
+
+export { createPost, getPost, deletePost,linkUnlikePost,replyToPost,getFeedPosts,getUserPosts} ;

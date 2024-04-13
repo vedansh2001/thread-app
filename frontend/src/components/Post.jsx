@@ -4,18 +4,23 @@ import Actions from "./Actions";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import {formatDistanceToNow} from "date-fns";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
 
 const Post = ({ post, postedBy }) => {
     const [liked, setLiked] = useState(false);
     const [user, setUser] = useState(null);
     const showToast = useShowToast();
     const navigate = useNavigate();
+    const currentUser = useRecoilValue(userAtom);
 
     useEffect(() => {
       const getUser = async() => {
         try {
           const res = await fetch("/api/users/profile/" + postedBy)
           const data = await res.json();
+          
           if(data.error){
             showToast("Error", data.error, "error")
             return;
@@ -28,6 +33,26 @@ const Post = ({ post, postedBy }) => {
       };
       getUser();
     }, [postedBy, showToast])
+
+    const handleDeletePost = async (e) => {
+      try {
+        e.preventDefault(); //so that on clicking delte icon we do not get directed to postpage. 
+        if(!window.confirm("Are you sure you want to delete this post?")) return;
+
+        const res = await fetch(`/api/posts/${post._id}`,{
+          method:"DELETE",
+        });
+        const data = await res.json();
+        if(data.error){
+          showToast("Error", data.error, "error");
+          return;
+        }
+        showToast("Success", "Post deleted", "success");
+
+      } catch (error) {
+        showToast("Error", error.message, "error");
+      }
+    };
 
     if(!user) return null;
 
@@ -101,22 +126,12 @@ const Post = ({ post, postedBy }) => {
                     <Text fontSize={"xs"} width={32} textAlign={'right'} color={"gray.light"}>
                       {formatDistanceToNow(new Date(post.createdAt))} ago
                     </Text>
+                    
+                    {currentUser?._id === user._id && <DeleteIcon size={20} onClick={handleDeletePost} />}
                     </Flex>
                 </Flex>
-                  
-{/* <Menu>
-  <MenuButton onClick={(e) => e.preventDefault()} >
-    <BsThreeDots />
-  </MenuButton>
-  <MenuList>
-    <MenuItem>Download</MenuItem>
-    <MenuItem>Create a Copy</MenuItem>
-    <MenuItem>Mark as Draft</MenuItem>
-    <MenuItem>Delete</MenuItem>
-    <MenuItem>Attend a Workshop</MenuItem>
-  </MenuList>
-</Menu> */}
-                
+
+
                 <Text fontSize={"sm"}>{post.text}</Text>
                 {post.img && (
                 <Box borderRadius={6} overflow={"hidden"} border={"1px solid"} borderColor={"gray.light"}>
