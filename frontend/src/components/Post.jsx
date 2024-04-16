@@ -21,6 +21,7 @@ const Post = ({ post, postedBy }) => {
           const res = await fetch("/api/users/profile/" + postedBy)
           const data = await res.json();
           
+          
           if(data.error){
             showToast("Error", data.error, "error")
             return;
@@ -57,7 +58,7 @@ const Post = ({ post, postedBy }) => {
     if(!user) return null;
 
   return (
-    <Link to={'/${user.username}/post/${post._id}'}>
+    <Link to={`/${user.username}/post/${post._id}`}>
         <Flex gap={3} mb={4} py={5}>
             <Flex flexDirection={"column"} alignItems={"center"}>
                 <Avatar size='md' name={user.name} src={user?.profilePic} 

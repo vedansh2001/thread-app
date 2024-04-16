@@ -4,33 +4,17 @@ import { useParams } from "react-router-dom";
 import useShowToast from '../hooks/useShowToast';
 import { Flex, Spinner } from "@chakra-ui/react";
 import Post from "../components/Post";
+import useGetUserProfile from "../hooks/useGetUserProfile";
 
 const UserPage = () => {
 
-  const[user, setUser] = useState(null);
+  const {user, loading} = useGetUserProfile();  //custom hook to get user and laoding.
   const {username} = useParams();
   const showToast = useShowToast();
-  const [loading, setloading] = useState(true);
   const [posts, setPosts] = useState([]);
   const [fetchingPosts, setFetchingPosts] = useState(true);
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const res = await fetch(`/api/users/profile/${username}`);
-        const data = await res.json();
-        if(data.error){
-          showToast("Error", data.error, "error");
-          return;
-        }
-        setUser(data);        
-      } catch (error) {
-        showToast("Error", error.message, "error");
-      }
-      finally{
-        setloading(false);
-      }
-    }
+  useEffect(() => { 
 
     const getPosts = async () => {
       setFetchingPosts(true);
@@ -45,8 +29,7 @@ const UserPage = () => {
         setFetchingPosts(false);
       }
     }
-
-    getUser(); 
+ 
     getPosts();
   },[username, showToast]);
     
@@ -60,7 +43,7 @@ const UserPage = () => {
 
   if(!user && !loading) return <h1>User not found</h1>;
 
-// Writng comment over here become can't write in "return"..
+// Writng comment over here because can't write in "return"..
 // loading spinner will be displayed until the loading state becomes false
 //  indicating that posts have been fetched.
 // {!loading && posts.length > 0 && (

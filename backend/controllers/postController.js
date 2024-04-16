@@ -41,20 +41,19 @@ const createPost = async(req, res) => {
     }
 };
 
-const getPost = async(req, res) => {
-    try {
-        const post = await Post.findById(req.params.id)
-
-        if(!post){
-            return res.status(404).json({ error: "Post not found"})
-        }
+const getPost = async (req, res) => {
+	try {
+		const post = await Post.findById(req.params.id);
         
-        res.status(500).json({ post });
-        
-    } catch (err) {
-        res.status(500).json({error: err.message});
+		if (!post) {
+			return res.status(404).json({ error: "Post not found" });
+		}
 
-    }
+		res.status(200).json(post);
+        console.log(`this is the post ${post}`);
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
 };
 
 const deletePost = async (req, res) => {
@@ -115,33 +114,32 @@ const linkUnlikePost = async(req, res) => {
 }
 
 const replyToPost = async (req, res) => {
-    try {
-        const {text} = req.body; //will be provided by frontend
-        const postId = req.params.id;
-        const userId = req.user._id;
-        const userProfilePic = req.user._id;
-        const username = req.user.username;
+	try {
+		const { text } = req.body;
+		const postId = req.params.id;
+		const userId = req.user._id;
+		const userProfilePic = req.user.profilePic;
+		const username = req.user.username;
 
-        if(!text){
-            return res.status(400).json({error: "Text field is required"})
-        }
+		if (!text) {
+			return res.status(400).json({ error: "Text field is required" });
+		}
 
-        const post = await Post.findById(postId);
-        if(!post){
-            return res.status(400).json({error: "Post not found"});
-        }
+		const post = await Post.findById(postId);
+		if (!post) {
+			return res.status(404).json({ error: "Post not found" });
+		}
 
-            const reply = {userId, text, userProfilePic, username};
+		const reply = { userId, text, userProfilePic, username };
 
-            post.replies.push(reply);
-            await post.save();
+		post.replies.push(reply);
+		await post.save();
 
-            res.status(200).json({message: "Reply andded successfully", post})
-
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
-}
+		res.status(200).json(reply);
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
+};
 
 const getFeedPosts = async (req, res) => {
     try {
