@@ -3,20 +3,21 @@ ModalHeader, ModalOverlay, Text, useDisclosure } from "@chakra-ui/react"
 import { useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import userAtom from "../atoms/userAtom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import postsAtom from "../atoms/postsAtom";
 
 
 
-const Actions = ({ post:post_ }) => {
+const Actions = ({ post }) => {
     const user = useRecoilValue(userAtom);
-    const [liked, setLiked] = useState(post_?.likes.includes(user?._id));
+    const [liked, setLiked] = useState(post?.likes.includes(user?._id));
     const showToast = useShowToast();
     const [isLiking, setIsLiking] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
-    //so we are getting a props (i.e post_) and setting it as an initial state for post.
-    const [post,setPost] = useState(post_);
     const{ isOpen, onOpen, onClose } = useDisclosure()
     const [reply, setReply] = useState("");
+    const [posts,setPosts] = useRecoilState(postsAtom);
+
 
     const handleLikeAndUnlike = async() => {
         if(!user) return showToast('Error', 'You must be logged in to like a post', 'error');
@@ -36,10 +37,23 @@ const Actions = ({ post:post_ }) => {
             
             if(!liked){
                 //add the id of the current user to the post.likes array
-                setPost({...post, likes: [...post.likes, user._id]});
+                const updatePosts = posts.map((p) => {
+                    if(p._id === post._id){
+                        return { ...p, likes: [...p.likes, user._id]};
+                    }
+                    return p;
+                })
+                setPosts(updatePosts);
             }else{
-                //remove the id of the current user from post.likes array
-                setPost({...post, likes: post.likes.filter((id) => id !== user._id)});
+                //first of all we find post which we are unlinking and then we remove the id 
+                // of the current user from the liked array.
+                const updatedPosts = posts.map((p) => {
+                    if(p._id === post._id){
+                        return { ...p, likes: p.likes.filter((id) => id !== user._id)};
+                    }
+                    return p;
+                })
+                setPosts(updatedPosts);
             }
             setLiked(!liked);
 
@@ -65,7 +79,13 @@ const Actions = ({ post:post_ }) => {
             const data = await res.json()
             if(data.error) return showToast("Error", data.error, "error")
 
-            setPost({...post, replies: [...post.replies, data.reply]})
+            const updatedPosts = posts.map((p) => {
+                if(p._id === post._id){
+                    return {...p, replies:[...p.replies, data]};
+                }
+                return p;
+            })
+            setPosts(updatedPosts);
             showToast("Success", "Reply posted successfully", "success")
             console.log(data);
             onClose();

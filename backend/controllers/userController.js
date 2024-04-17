@@ -1,8 +1,11 @@
 import User from "../models/userModel.js";
+import Post from "../models/postModel.js";
+
 import bcrypt from "bcryptjs";
 import generateTokenAndCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 import {v2 as cloudinary} from "cloudinary";
 import mongoose from "mongoose";
+
 
 const getUserProfile = async (req, res) => {
     //We will fetch user profile either with username or userId
@@ -126,25 +129,25 @@ const followUnFollowUser = async(req,res) => {
           //unfollow user
           //modify current user following, modify followers of userToModify 
           
-          await User.findByIdAndUpdate(id, {$pull: {follower: req.user._id}});
-          await User.findByIdAndUpdate(req.user._id, {$pull: {following: id}});
-          res.status(200).json({message: "User unfollowed successfully"});
+          await User.findByIdAndUpdate(id, { $pull: { followers: req.user._id } });
+			await User.findByIdAndUpdate(req.user._id, { $pull: { following: id } });
+			res.status(200).json({ message: "User unfollowed successfully" });
           
                       
         }
         else{
             //follow user
             
-            await User.findByIdAndUpdate(id, {$push: {follower: req.user._id}});
-            await User.findByIdAndUpdate(req.user._id, {$push: {following: id}});
-            res.status(200).json({message: "user followed successfully"});
+            await User.findByIdAndUpdate(id, { $push: { followers: req.user._id } });
+			await User.findByIdAndUpdate(req.user._id, { $push: { following: id } });
+			res.status(200).json({ message: "User followed successfully" });
 
         }
         
     } catch (err) {
-        res.status(500).json({ error: err.message});
-        console.log("Error in followUnFollowUser: ", err.message);
-    }
+		res.status(500).json({ error: err.message });
+		console.log("Error in followUnFollowUser: ", err.message);
+	}
 };
 
 const updateUser = async (req, res) => {
@@ -173,7 +176,6 @@ const updateUser = async (req, res) => {
           const uploadedResponse = await cloudinary.uploader.upload(profilePic);
 //a secure url will be provided by cloudinary and it will be reassigned to profilePic
           profilePic = uploadedResponse.secure_url;
-          console.log(profilePic);
         }
 
         user.name = name || user.name;
@@ -183,6 +185,20 @@ const updateUser = async (req, res) => {
 		user.bio = bio || user.bio;
 
         user = await user.save();
+        
+
+// Find all posts that this user replied and update username and userProfilePic fields
+await Post.updateMany(
+    { "replies.userId": userId },
+    {
+        $set: {
+            "replies.$[reply].username": user.username,
+            "replies.$[reply].userProfilePic": user.profilePic,
+        },
+    },
+    { arrayFilters: [{ "reply.userId": userId }] }
+);
+
         //password should be null in response, so that password is not sent in cloudinary
         user.password = null;
 

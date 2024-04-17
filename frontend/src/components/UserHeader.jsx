@@ -41,10 +41,10 @@ const UserHeader = ({user}) => {
                 return;
             }  
             if(following){
-                showToast("Sucess", `Unfollowed ${user.name}`, "success");
+                showToast("Sucess", `followed ${user.name}`, "success");
                 user.follower.pop(); //simulate removing to follower
             }else{
-                showToast("Success", `Unfollwed ${user.name}`, "success");
+                showToast("Success", `followed ${user.name}`, "success");
                 user.follower.push(currentUser?._id); //simulate adding to follower
             }
             setFollowing(!following);  
