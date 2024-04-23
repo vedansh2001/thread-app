@@ -4,6 +4,7 @@ import userAtom from "../atoms/userAtom";
 import {AiFillHome} from 'react-icons/ai';
 import { Button } from '@chakra-ui/react';
 import {RxAvatar} from 'react-icons/rx';
+import {BsFillChatQuoteFill} from 'react-icons/bs';
 
 
 //we use RouterLink from "react-router-dom" to get client-side routing
@@ -48,6 +49,9 @@ const Header = () => {
       <Flex alignItems={"center"} gap={4} >
       <Link as={RouterLink} to={`/${user.username}`} >
         <RxAvatar size={24} />
+      </Link>
+      <Link as={RouterLink} to={`/chat`} >
+        <BsFillChatQuoteFill size={20} />
       </Link>
       <Button size={"xs"} onClick={logout}
       >
