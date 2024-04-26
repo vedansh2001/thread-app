@@ -18,14 +18,13 @@ const getUserProfile = async (req, res) => {
             user = await User.findOne({ _id: query }).select("-password").select("-updatedAt");
         }else{
         //query is username
-        user = await User.findOne({username: query}).select("-password").select("-updatedAt");
+        user = await User.findOne({ username: query }).select("-password").select("-updatedAt");
         }
-        if(!user) return res.status(400).json({error: "User not found"});  
+        if(!user) return res.status(404).json({error: "User not found"});  
 
         res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({error: error.message});
-        console.log("Error in getUserProfile: ", error.message);        
+        res.status(500).json({error: error.message});      
     }
 }
 
