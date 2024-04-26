@@ -37,6 +37,7 @@ This application encompasses all the fundamental functionalities expected from a
 ![App Screenshot](Readme_photos/Login-Signup.png)
 ![App Screenshot](Readme_photos/Homepage-Userpage.png)
 ![App Screenshot](Readme_photos/Post-Reply.png)
+![App Screenshot](Readme_photos/chat-page.png)
 
 
 ## Deployment
