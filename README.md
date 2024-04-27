@@ -42,6 +42,27 @@ This application encompasses all the fundamental functionalities expected from a
 
 ## Deployment
 
-I am currently in the development phase of the project and have not deployed it yet.
-Upon completion, I plan to deploy it on either Vercel or AWS EC2 to ensure seamless accessibility and performance.
+I have deployed the website on Render and am currently in the process of further developing the project by implementing additional features and optimizing the code. While there are a few small bugs that I am actively addressing, the project remains a work in progress. Once development is complete, I plan to deploy it on AWS EC2. In the meantime, the current version is deployed on Render. 
+
+You can access it at: https://thread-app-initiald-deploy-version.onrender.com
+
+## Setup .env file
+
+PORT=...
+MONGO_URI=...
+JWT_SECRET=...
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+
+
+## Build the app
+
+npm run build
+
+## Start the app
+
+npm start
+
+
 
