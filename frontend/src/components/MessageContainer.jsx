@@ -6,7 +6,7 @@ import useShowToast from '../hooks/useShowToast';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { conversationAtom, selectedConversationAtom } from '../atoms/messagesAtom';
 import userAtom from '../atoms/userAtom';
-import { useSocket } from '../../context/SocketContext';
+import { useSocket } from "../context/SocketContext.jsx";
 
 const MessageContainer = () => {
 
